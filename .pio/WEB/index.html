@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐔 Smart Kandang Ayam</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>🐔 Smart Kandang Ayam</h1>
+            <p>Sistem Monitoring & Kontrol Otomatis</p>
+            <div class="status-bar">
+                <span class="status" id="connStatus">⏳ Menghubungkan...</span>
+                <span class="status" id="updateTime">⏱️ -</span>
+            </div>
+        </header>
+
+        <!-- ALERTS -->
+        <div class="alert alert-danger" id="alertGas">
+            🚨 PERINGATAN: Amonia tinggi! Kipas & alarm aktif!
+        </div>
+        <div class="alert alert-warning" id="alertHeat">
+            🌡️ PERINGATAN: Suhu kandang tinggi! Kipas dinyalakan!
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ Pengaturan</button>
+            <button class="tab-btn" onclick="switchTab('wifi')">📡 WiFi</button>
+        </div>
+
+        <!-- TAB: DASHBOARD -->
+        <div id="tab-dashboard" class="tab-content active">
+            <!-- SENSOR CARDS -->
+            <h2 class="section-title">📊 Kondisi Kandang</h2>
+            <div class="grid sensor-grid">
+                <div class="card card-temp">
+                    <div class="card-icon">🌡️</div>
+                    <h3>Suhu</h3>
+                    <div class="value" id="suhu">--°C</div>
+                    <div class="progress-bar">
+                        <div class="progress progress-temp" id="progSuhu"></div>
+                    </div>
+                    <small>Batas: <span id="threshSuhuDisplay">32</span>°C</small>
+                </div>
+
+                <div class="card card-humid">
+                    <div class="card-icon">💧</div>
+                    <h3>Kelembaban</h3>
+                    <div class="value" id="kelembaban">--%</div>
+                    <div class="progress-bar">
+                        <div class="progress progress-humid" id="progKelembaban"></div>
+                    </div>
+                    <small>Relative Humidity</small>
+                </div>
+
+                <div class="card card-gas">
+                    <div class="card-icon">💨</div>
+                    <h3>Amonia (Gas)</h3>
+                    <div class="value" id="gas">--</div>
+                    <div class="progress-bar">
+                        <div class="progress progress-gas" id="progGas"></div>
+                    </div>
+                    <small>Batas: <span id="threshGasDisplay">1500</span></small>
+                </div>
+
+                <div class="card card-motion">
+                    <div class="card-icon">🚶</div>
+                    <h3>Aktivitas Ayam</h3>
+                    <div class="value" id="gerakan">--</div>
+                    <span class="badge badge-off" id="badgeGerakan">Standby</span>
+                </div>
+            </div>
+
+            <!-- KONTROL KIPAS -->
+            <h2 class="section-title">🌀 Kontrol Kipas</h2>
+            <div class="control-card">
+                <div class="control-header">
+                    <div class="control-info">
+                        <div class="control-icon">🌀</div>
+                        <div>
+                            <h3>Status Kipas</h3>
+                            <span class="badge badge-off" id="badgeKipas">--</span>
+                        </div>
+                    </div>
+                    <div class="mode-display">
+                        <small>Mode saat ini:</small>
+                        <div class="mode-text" id="modeKipasText">--</div>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn btn-auto" id="btnKipasAuto" onclick="setKipas('auto')">
+                        🤖 OTOMATIS
+                    </button>
+                    <button class="btn btn-on" id="btnKipasOn" onclick="setKipas('on')">
+                        ✅ NYALAKAN
+                    </button>
+                    <button class="btn btn-off" id="btnKipasOff" onclick="setKipas('off')">
+                        ⛔ MATIKAN
+                    </button>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Mode OTOMATIS: Kipas nyala saat suhu ≥ <span id="infoSuhu">32</span>°C 
+                    ATAU gas ≥ <span id="infoGas">1500</span>
+                </div>
+            </div>
+
+            <!-- KONTROL BUZZER -->
+            <h2 class="section-title">🔔 Kontrol Buzzer</h2>
+            <div class="control-card">
+                <div class="control-header">
+                    <div class="control-info">
+                        <div class="control-icon">🔔</div>
+                        <div>
+                            <h3>Status Buzzer</h3>
+                            <span class="badge badge-off" id="badgeBuzzer">--</span>
+                        </div>
+                    </div>
+                    <div class="mode-display">
+                        <small>Mode saat ini:</small>
+                        <div class="mode-text" id="modeBuzzerText">--</div>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn btn-auto" id="btnBuzzerAuto" onclick="setBuzzer('auto')">
+                        🤖 OTOMATIS
+                    </button>
+                    <button class="btn btn-off" id="btnBuzzerMute" onclick="setBuzzer('off')">
+                        🔕 MATIKAN (MUTE)
+                    </button>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Mode OTOMATIS: Buzzer berbunyi saat gas terdeteksi tinggi.
+                    Mode MUTE: Buzzer dimatikan manual.
+                </div>
+            </div>
+
+            <!-- STATUS INDIKATOR LAIN -->
+            <h2 class="section-title">💡 Status Indikator</h2>
+            <div class="grid status-grid">
+                <div class="card status-card">
+                    <div class="status-icon">💡</div>
+                    <h3>LED</h3>
+                    <span class="badge badge-off" id="badgeLed">--</span>
+                    <small>Indikator gas tinggi</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SETTINGS -->
+        <div id="tab-settings" class="tab-content">
+            <h2 class="section-title">⚙️ Pengaturan Threshold</h2>
+            
+            <div class="card setting-card">
+                <h3>🌡️ Batas Suhu Kipas Otomatis</h3>
+                <p class="setting-desc">Kipas akan menyala ketika suhu mencapai nilai ini</p>
+                
+                <div class="slider-container">
+                    <input type="range" id="suhuSlider" min="20" max="45" step="0.5" value="32" oninput="updateSuhuDisplay()">
+                    <div class="slider-value">
+                        <span id="suhuSliderValue">32</span>°C
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <input type="number" id="suhuInput" min="20" max="45" step="0.5" value="32">
+                    <span>°C</span>
+                </div>
+            </div>
+
+            <div class="card setting-card">
+                <h3>💨 Batas Gas Amonia</h3>
+                <p class="setting-desc">Kipas, LED, dan Buzzer akan aktif ketika gas mencapai nilai ini</p>
+                
+                <div class="slider-container">
+                    <input type="range" id="gasSlider" min="500" max="4000" step="100" value="1500" oninput="updateGasDisplay()">
+                    <div class="slider-value">
+                        <span id="gasSliderValue">1500</span>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <input type="number" id="gasInput" min="500" max="4000" step="100" value="1500">
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Nilai sensor: 0-4095. Semakin tinggi = semakin banyak gas.
+                    <br>📌 Saran: 1000-1500 untuk kandang ayam
+                </div>
+            </div>
+
+            <button class="btn btn-save btn-full" onclick="saveThreshold()">
+                💾 Simpan Pengaturan
+            </button>
+            
+            <div class="status-msg" id="settingStatus"></div>
+        </div>
+
+        <!-- TAB: WIFI -->
+        <div id="tab-wifi" class="tab-content">
+            <h2 class="section-title">📡 Pengaturan WiFi</h2>
+            
+            <div class="card">
+                <h3>WiFi Saat Ini</h3>
+                <div class="wifi-current">
+                    <strong>SSID:</strong> <span id="currentSSID">-</span>
+                </div>
+                
+                <button class="btn btn-scan btn-full" onclick="scanWifi()">
+                    🔍 Scan WiFi Tersedia
+                </button>
+                
+                <div class="network-list" id="netList"></div>
+            </div>
+
+            <div class="card">
+                <h3>Ganti WiFi</h3>
+                <p class="setting-desc">⚠️ ESP32 akan restart setelah ganti WiFi</p>
+                
+                <label>Nama WiFi (SSID):</label>
+                <input type="text" id="newSSID" class="input-full" placeholder="Nama WiFi">
+                
+                <label>Password:</label>
+                <input type="password" id="newPass" class="input-full" placeholder="Password WiFi">
+                
+                <button class="btn btn-save btn-full" onclick="saveWifi()">
+                    💾 Simpan & Restart
+                </button>
+                
+                <button class="btn btn-danger btn-full" onclick="resetWifi()">
+                    🔄 Reset WiFi (Kembali ke Setup Mode)
+                </button>
+                
+                <div class="status-msg" id="wifiStatus"></div>
+            </div>
+        </div>
+
+        <!-- SETTINGS IP -->
+        <div class="card ip-config">
+            <details>
+                <summary>🔧 Pengaturan IP ESP32</summary>
+                <div class="setting-row" style="margin-top:15px;">
+                    <input type="text" id="espIP" placeholder="192.168.1.xxx">
+                    <button class="btn btn-save" onclick="saveIP()">💾 Simpan IP</button>
+                </div>
+                <small>* Lihat IP di Serial Monitor PlatformIO</small>
+            </details>
+        </div>
+
+        <!-- DEBUG PANEL -->
+        <div class="card ip-config" style="margin-top:12px;">
+            <details id="debugDetails">
+                <summary>🐛 Debug Panel (Relay & Sensor)</summary>
+                <div style="margin-top:14px;">
+                    <button class="btn btn-scan" style="width:100%;margin-bottom:12px;" onclick="fetchDebug()">
+                        🔄 Refresh Debug Info
+                    </button>
+                    <div id="debugContent">
+                        <small style="opacity:0.6">Klik Refresh untuk muat info debug dari ESP32.</small>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <footer>
+            <p>🐔 Smart Kandang Ayam IoT © 2024</p>
+            <p>Update: <span id="lastUpdate">-</span></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

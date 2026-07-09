@@ -1,0 +1,557 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    color: #fff;
+    min-height: 100vh;
+    padding: 15px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ====== HEADER ====== */
+header {
+    text-align: center;
+    padding: 25px 0;
+}
+
+header h1 {
+    font-size: 2.5em;
+    background: linear-gradient(45deg, #ffa500, #ff6b35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.status-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+}
+
+.conn-ok {
+    background: rgba(0,255,136,0.15) !important;
+    border-color: #00ff88 !important;
+    color: #00ff88;
+}
+
+.conn-fail {
+    background: rgba(255,0,0,0.15) !important;
+    border-color: #ff4444 !important;
+    color: #ff4444;
+}
+
+/* ====== ALERTS ====== */
+.alert {
+    padding: 14px 22px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: none;
+    animation: blink 1s infinite;
+}
+
+.alert-danger {
+    background: rgba(255,0,0,0.15);
+    border: 1px solid #ff4444;
+    color: #ff4444;
+}
+
+.alert-warning {
+    background: rgba(255,165,0,0.15);
+    border: 1px solid #ffa500;
+    color: #ffa500;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ====== TABS ====== */
+.tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.05);
+    padding: 5px;
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #888;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #ff6b35, #ffa500);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255,107,53,0.4);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== SECTION TITLE ====== */
+.section-title {
+    margin: 25px 0 15px;
+    color: #ffa500;
+    font-size: 1.2em;
+    border-left: 4px solid #ffa500;
+    padding-left: 12px;
+}
+
+/* ====== GRID ====== */
+.grid {
+    display: grid;
+    gap: 15px;
+}
+
+.sensor-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.status-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* ====== CARDS ====== */
+.card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 22px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.15);
+}
+
+.card-icon {
+    font-size: 2.2em;
+    margin-bottom: 8px;
+}
+
+.card h3 {
+    color: #aaa;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.value {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+.card-temp .value { color: #ff6b35; }
+.card-humid .value { color: #00d2ff; }
+.card-gas .value { color: #ffc107; }
+.card-motion .value { color: #9c27b0; font-size: 1.4em; }
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin: 12px 0 8px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s;
+    width: 0%;
+}
+
+.progress-temp { background: linear-gradient(90deg, #ff6b35, #ff0000); }
+.progress-humid { background: linear-gradient(90deg, #00d2ff, #0066ff); }
+.progress-gas { background: linear-gradient(90deg, #ffc107, #ff0000); }
+
+small {
+    color: #666;
+    font-size: 0.8em;
+}
+
+/* ====== STATUS CARD ====== */
+.status-card {
+    text-align: center;
+}
+
+.status-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+/* ====== BADGE ====== */
+.badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin: 8px 0;
+}
+
+.badge-on {
+    background: rgba(0,230,118,0.2);
+    color: #00e676;
+    border: 1px solid rgba(0,230,118,0.4);
+}
+
+.badge-off {
+    background: rgba(255,255,255,0.06);
+    color: #888;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.badge-warn {
+    background: rgba(255,193,7,0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255,193,7,0.4);
+    animation: blink 1s infinite;
+}
+
+/* ====== CONTROL CARD ====== */
+.control-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 15px;
+}
+
+.control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.control-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.control-icon {
+    font-size: 2.5em;
+}
+
+.mode-display {
+    text-align: right;
+}
+
+.mode-text {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #ffa500;
+    margin-top: 4px;
+}
+
+/* ====== BUTTONS ====== */
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #fff;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.btn-auto {
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+}
+
+.btn-on {
+    background: linear-gradient(135deg, #00b09b, #00e676);
+}
+
+.btn-off {
+    background: linear-gradient(135deg, #c31432, #ff4444);
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #614385, #516395);
+}
+
+.btn-scan {
+    background: linear-gradient(135deg, #0984e3, #0770c4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #d63031, #c0392b);
+    margin-top: 10px;
+}
+
+.btn-active {
+    box-shadow: 0 0 0 3px #fff, 0 0 20px rgba(255,165,0,0.5);
+    transform: scale(1.05);
+}
+
+.info-box {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(255,165,0,0.08);
+    border-left: 3px solid #ffa500;
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: #ccc;
+}
+
+/* ====== SETTINGS ====== */
+.setting-card {
+    margin-bottom: 15px;
+}
+
+.setting-card h3 {
+    color: #ffa500;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.setting-desc {
+    color: #888;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.slider-container {
+    margin: 15px 0;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35, #ffa500);
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(255,107,53,0.5);
+}
+
+.slider-value {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 700;
+    color: #ffa500;
+    margin-top: 10px;
+}
+
+.setting-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.setting-row input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 1em;
+    flex: 1;
+    min-width: 100px;
+}
+
+.input-full {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 1em;
+    margin-top: 8px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    color: #ccc;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.status-msg {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+    text-align: center;
+    font-weight: 600;
+}
+
+.status-msg.success {
+    background: rgba(0,230,118,0.2);
+    color: #00e676;
+    border: 1px solid rgba(0,230,118,0.4);
+    display: block;
+}
+
+.status-msg.error {
+    background: rgba(255,68,68,0.2);
+    color: #ff4444;
+    border: 1px solid rgba(255,68,68,0.4);
+    display: block;
+}
+
+/* ====== WIFI ====== */
+.wifi-current {
+    background: rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.network-list {
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    margin-top: 15px;
+    display: none;
+}
+
+.network-list.show { display: block; }
+
+.network-item {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.network-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.network-item:last-child {
+    border-bottom: none;
+}
+
+/* ====== IP CONFIG ====== */
+.ip-config {
+    margin-top: 20px;
+}
+
+.ip-config summary {
+    cursor: pointer;
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.ip-config summary:hover {
+    color: #ffa500;
+}
+
+/* ====== FOOTER ====== */
+footer {
+    text-align: center;
+    padding: 30px 0 15px;
+    color: #444;
+    font-size: 0.85em;
+}
+
+footer p { margin: 5px 0; }
+
+/* ====== MOBILE ====== */
+@media (max-width: 600px) {
+    header h1 { font-size: 1.8em; }
+    .value { font-size: 2em; }
+    .control-buttons { flex-direction: column; }
+    .btn { width: 100%; }
+    .tabs { flex-direction: column; }
+}
