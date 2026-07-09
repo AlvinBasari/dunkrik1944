@@ -37,13 +37,17 @@
 #define DHT_TYPE DHT11
 
 // ==================
-// POLARITAS RELAY
+// POLARITAS RELAY & BUZZER
 // ==================
 // Banyak modul relay 1/2-channel murah itu ACTIVE-LOW:
 // LOW = relay ON (closed), HIGH = relay OFF (open).
 // Kalau kipas kamu nyala terus / gak bisa mati dari web,
 // coba ganti nilai ini ke true.
 #define RELAY_ACTIVE_LOW true
+
+// Jika buzzer kamu tipe active-LOW (bunyi saat LOW, mati saat HIGH),
+// ganti nilai ini ke true.
+#define BUZZER_ACTIVE_LOW false
 
 // ==================
 // MODE WIFI
@@ -107,6 +111,18 @@ void setKipas(bool nyala) {
     digitalWrite(RELAY_PIN, nyala ? HIGH : LOW);
   }
   kipasStatus = nyala;
+}
+
+// ==================
+// FUNGSI: SET BUZZER (handle polaritas buzzer)
+// ==================
+void setBuzzerState(bool nyala) {
+  if (BUZZER_ACTIVE_LOW) {
+    digitalWrite(BUZZER_PIN, nyala ? LOW : HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, nyala ? HIGH : LOW);
+  }
+  buzzerStatus = nyala;
 }
 
 // ==================
@@ -262,19 +278,16 @@ void kontrolOtomatis() {
   // ===== BUZZER =====
   if (modeBuzzer == 1) {
     // MANUAL MUTE
-    digitalWrite(BUZZER_PIN, LOW);
-    buzzerStatus = false;
+    setBuzzerState(false);
   } else if (gasTinggi) {
     // BEEP BEEP saat gas tinggi
     if (millis() - lastBuzzerToggle >= 300) {
       lastBuzzerToggle = millis();
       buzzerState = !buzzerState;
-      digitalWrite(BUZZER_PIN, buzzerState ? HIGH : LOW);
-      buzzerStatus = buzzerState;
+      setBuzzerState(buzzerState);
     }
   } else {
-    digitalWrite(BUZZER_PIN, LOW);
-    buzzerStatus = false;
+    setBuzzerState(false);
   }
 }
 
@@ -585,6 +598,7 @@ void handleDebug() {
   bool gasTinggi  = nilaiGas >= gasThreshold;
   int  relayPin   = digitalRead(RELAY_PIN);
   int  mq2Pin     = digitalRead(MQ2_PIN);
+  int  buzzerPin  = digitalRead(BUZZER_PIN);
 
   // Evaluasi kenapa kipas ON/OFF
   String alasan = "";
@@ -610,7 +624,18 @@ void handleDebug() {
     konflikPesan = "Pin HIGH tapi RELAY_ACTIVE_LOW=true. Relay mungkin aktif! Coba ganti ke false.";
   }
 
-  StaticJsonDocument<768> doc;
+  // Deteksi konflik polaritas buzzer
+  bool konflikBuzzer = false;
+  String konflikBuzzerPesan = "";
+  if (!buzzerStatus && buzzerPin == LOW && !BUZZER_ACTIVE_LOW) {
+    konflikBuzzer = true;
+    konflikBuzzerPesan = "Pin LOW tapi BUZZER_ACTIVE_LOW=false. Buzzer mungkin aktif! Coba ganti ke true.";
+  } else if (!buzzerStatus && buzzerPin == HIGH && BUZZER_ACTIVE_LOW) {
+    konflikBuzzer = true;
+    konflikBuzzerPesan = "Pin HIGH tapi BUZZER_ACTIVE_LOW=true. Buzzer mungkin aktif! Coba ganti ke false.";
+  }
+
+  StaticJsonDocument<1024> doc;
   // Relay
   doc["relay_active_low"]   = RELAY_ACTIVE_LOW;
   doc["relay_pin_number"]   = RELAY_PIN;
@@ -620,7 +645,7 @@ void handleDebug() {
   doc["mode_kipas"]         = modeKipas;
   doc["mode_kipas_str"]     = modeKipas==0 ? "OTOMATIS" : modeKipas==1 ? "MANUAL ON" : "MANUAL OFF";
   doc["alasan_kipas"]       = alasan;
-  // Konflik
+  // Konflik Relay
   doc["konflik_polaritas"]  = konflikPolaritas;
   doc["konflik_pesan"]      = konflikPesan;
   // Sensor
@@ -635,6 +660,12 @@ void handleDebug() {
   // Buzzer
   doc["mode_buzzer"]        = modeBuzzer;
   doc["buzzer_status"]      = buzzerStatus;
+  doc["buzzer_active_low"]  = BUZZER_ACTIVE_LOW;
+  doc["buzzer_pin_number"]  = BUZZER_PIN;
+  doc["buzzer_pin_state"]   = buzzerPin == HIGH ? "HIGH" : "LOW";
+  doc["buzzer_pin_raw"]     = buzzerPin;
+  doc["konflik_buzzer"]     = konflikBuzzer;
+  doc["konflik_buzzer_pesan"] = konflikBuzzerPesan;
 
   String response;
   serializeJson(doc, response);
@@ -646,8 +677,12 @@ void handleDebug() {
   Serial.printf("  Relay pin state  : %s\n", relayPin == HIGH ? "HIGH" : "LOW");
   Serial.printf("  kipasStatus      : %s\n", kipasStatus ? "ON" : "OFF");
   Serial.printf("  modeKipas        : %d (%s)\n", modeKipas, doc["mode_kipas_str"].as<const char*>());
-  Serial.printf("  Alasan           : %s\n", alasan.c_str());
-  if (konflikPolaritas) Serial.printf("  ⚠️ KONFLIK: %s\n", konflikPesan.c_str());
+  Serial.printf("  Alasan Kipas     : %s\n", alasan.c_str());
+  if (konflikPolaritas) Serial.printf("  ⚠️ KONFLIK RELAY: %s\n", konflikPesan.c_str());
+  Serial.printf("  BUZZER_ACTIVE_LOW: %s\n", BUZZER_ACTIVE_LOW ? "true" : "false");
+  Serial.printf("  Buzzer pin state : %s\n", buzzerPin == HIGH ? "HIGH" : "LOW");
+  Serial.printf("  buzzerStatus     : %s\n", buzzerStatus ? "ON" : "OFF");
+  if (konflikBuzzer) Serial.printf("  ⚠️ KONFLIK BUZZER: %s\n", konflikBuzzerPesan.c_str());
   Serial.println("========================");
 }
 
@@ -696,7 +731,7 @@ void setup() {
   pinMode(MQ2_PIN, INPUT); // ⚡ MQ2 DO (digital input)
 
   setKipas(false);
-  digitalWrite(BUZZER_PIN, LOW);
+  setBuzzerState(false);
 
   dht.begin();
 
@@ -708,13 +743,13 @@ void setup() {
     startAPMode();
   } else {
     // Beep 2x tanda siap
-    digitalWrite(BUZZER_PIN, HIGH);
+    setBuzzerState(true);
     delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
+    setBuzzerState(false);
     delay(100);
-    digitalWrite(BUZZER_PIN, HIGH);
+    setBuzzerState(true);
     delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
+    setBuzzerState(false);
   }
 
   // Setup routes

@@ -321,12 +321,23 @@ function renderDebug(d) {
     const pinColor   = d.relay_pin_state === 'HIGH' ? warn('HIGH') : warn('LOW');
     const alColor    = d.relay_active_low ? ok('true') : err('false');
 
+    const buzzerColor = d.buzzer_status ? ok('ON ✅') : err('OFF ⛔');
+    const buzzerPinColor = d.buzzer_pin_state === 'HIGH' ? warn('HIGH') : warn('LOW');
+    const buzzerAlColor = d.buzzer_active_low ? ok('true') : err('false');
+
     let konflikHTML = '';
     if (d.konflik_polaritas) {
-        konflikHTML = `
+        konflikHTML += `
         <div style="background:rgba(231,76,60,0.15);border:1px solid #e74c3c;border-radius:8px;padding:12px;margin:10px 0;">
-            ⚠️ <strong>KONFLIK POLARITAS TERDETEKSI!</strong><br>
+            ⚠️ <strong>KONFLIK POLARITAS RELAY TERDETEKSI!</strong><br>
             <small>${d.konflik_pesan}</small>
+        </div>`;
+    }
+    if (d.konflik_buzzer) {
+        konflikHTML += `
+        <div style="background:rgba(231,76,60,0.15);border:1px solid #e74c3c;border-radius:8px;padding:12px;margin:10px 0;">
+            ⚠️ <strong>KONFLIK POLARITAS BUZZER TERDETEKSI!</strong><br>
+            <small>${d.konflik_buzzer_pesan}</small>
         </div>`;
     }
 
@@ -338,7 +349,7 @@ function renderDebug(d) {
 
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-            <td style="padding:6px 4px;opacity:0.7;">🔌 RELAY_ACTIVE_LOW</td>
+            <td style="padding:6px 4px;opacity:0.7;">🔌 RELAY_ACTIVE_LOW (Kipas)</td>
             <td style="padding:6px 4px;">${alColor}</td>
         </tr>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -368,6 +379,18 @@ function renderDebug(d) {
         <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
             <td style="padding:6px 4px;opacity:0.7;">📡 MQ2 DO Pin Raw</td>
             <td style="padding:6px 4px;">${val(d.mq2_pin_raw)} ${d.gas_terdeteksi_do ? err('(gas terdeteksi!)') : ok('(aman)')}</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+            <td style="padding:6px 4px;opacity:0.7;">🔌 BUZZER_ACTIVE_LOW</td>
+            <td style="padding:6px 4px;">${buzzerAlColor}</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+            <td style="padding:6px 4px;opacity:0.7;">📍 Pin Buzzer (GPIO${d.buzzer_pin_number})</td>
+            <td style="padding:6px 4px;">${buzzerPinColor}</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+            <td style="padding:6px 4px;opacity:0.7;">🔔 Status Buzzer</td>
+            <td style="padding:6px 4px;">${buzzerColor}</td>
         </tr>
         <tr>
             <td style="padding:6px 4px;opacity:0.7;">🔔 Mode Buzzer</td>
