@@ -53,7 +53,7 @@ export default function Header({
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-md py-4 px-6 md:px-8 flex justify-between items-center rounded-[20px_8px_20px_8px] border border-slate-150/40 shadow-[0_8px_30px_rgba(0,0,0,0.015)] my-5 mr-5 ml-5 md:ml-4 sticky top-5 z-40">
+    <header className="bg-white/80 backdrop-blur-md py-3 px-4 md:py-4 md:px-8 flex justify-between items-center rounded-[20px_8px_20px_8px] border border-slate-150/40 shadow-[0_8px_30px_rgba(0,0,0,0.015)] my-3 mx-3 md:my-5 md:mr-5 md:ml-4 sticky top-3 md:top-5 z-40">
       {/* KIRI: JUDUL & SUBJUDUL */}
       <div className="flex items-center gap-3">
         {/* Mobile Hamburger Button */}

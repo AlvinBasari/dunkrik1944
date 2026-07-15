@@ -182,9 +182,9 @@ export default function MonitoringView({
         </div>
       )}
 
-      {/* SENSOR STATS ROW — flex, auto-shrink, tetap satu baris tanpa scrollbar */}
-      <div className="flex flex-row gap-3 items-stretch">
-        <div className="flex-1 min-w-0">
+      {/* SENSOR GRID — grid 2 kolom di mobile, horizontal row di desktop */}
+      <div className="grid grid-cols-2 md:flex md:flex-row gap-3 md:items-stretch">
+        <div className="col-span-1 md:flex-1 md:min-w-0">
           <StatCard 
             title="Suhu Kandang"
             value={telemetry ? `${telemetry.suhu}°C` : '--°C'}
@@ -195,7 +195,7 @@ export default function MonitoringView({
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="col-span-1 md:flex-1 md:min-w-0">
           <StatCard 
             title="Kelembaban Udara"
             value={telemetry ? `${telemetry.kelembaban}%` : '--%'}
@@ -205,7 +205,7 @@ export default function MonitoringView({
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="col-span-1 md:flex-1 md:min-w-0">
           <StatCard 
             title="Kenyamanan HSI"
             value={telemetry ? `${hsiData.val}` : '---'}
@@ -216,7 +216,7 @@ export default function MonitoringView({
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="col-span-1 md:flex-1 md:min-w-0">
           <StatCard 
             title="Kadar Gas Amonia"
             value={telemetry ? `${telemetry.gas} ppm` : '-- ppm'}
@@ -227,7 +227,7 @@ export default function MonitoringView({
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="col-span-2 md:flex-1 md:min-w-0">
           <StatCard 
             title="Aktifitas Ayam"
             value={getPirText()}

@@ -228,7 +228,7 @@ export default function Home() {
         )}
 
         {/* MAIN BODY VIEW ORCHESTRATION - FLOATING CARD LAYOUT */}
-        <main className="flex-1 mx-5 md:ml-4 mb-5 p-6 md:p-8 bg-white/70 backdrop-blur-sm rounded-[32px_12px_32px_12px] border border-slate-150/40 shadow-[0_8px_30px_rgba(0,0,0,0.015)] overflow-y-auto">
+        <main className="flex-1 mx-3 md:mx-5 md:ml-4 mb-5 p-4 md:p-8 bg-white/70 backdrop-blur-sm rounded-[24px_10px_24px_10px] md:rounded-[32px_12px_32px_12px] border border-slate-150/40 shadow-[0_8px_30px_rgba(0,0,0,0.015)] overflow-y-auto">
           {activeTab === 'monitoring' && (
             <MonitoringView 
               telemetry={telemetry}
