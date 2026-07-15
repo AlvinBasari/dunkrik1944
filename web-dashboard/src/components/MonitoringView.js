@@ -182,51 +182,61 @@ export default function MonitoringView({
         </div>
       )}
 
-      {/* SENSOR GRID (5 columns) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <StatCard 
-          title="Suhu Kandang"
-          value={telemetry ? `${telemetry.suhu}°C` : '--°C'}
-          icon={Thermometer}
-          status={getSuhuStatus()}
-          subtext={settings ? `Target: < ${settings.suhuThreshold}°C` : 'Memuat...'}
-          glow={telemetry?.suhu >= (settings?.suhuThreshold || 32.0)}
-        />
+      {/* SENSOR STATS ROW — flex, auto-shrink, tetap satu baris tanpa scrollbar */}
+      <div className="flex flex-row gap-3">
+        <div className="flex-1 min-w-0">
+          <StatCard 
+            title="Suhu Kandang"
+            value={telemetry ? `${telemetry.suhu}°C` : '--°C'}
+            icon={Thermometer}
+            status={getSuhuStatus()}
+            subtext={settings ? `Target: < ${settings.suhuThreshold}°C` : 'Memuat...'}
+            glow={telemetry?.suhu >= (settings?.suhuThreshold || 32.0)}
+          />
+        </div>
 
-        <StatCard 
-          title="Kelembaban Udara"
-          value={telemetry ? `${telemetry.kelembaban}%` : '--%'}
-          icon={Droplets}
-          status={getLembabStatus()}
-          subtext="Batas Aman: 50% - 80%"
-        />
+        <div className="flex-1 min-w-0">
+          <StatCard 
+            title="Kelembaban Udara"
+            value={telemetry ? `${telemetry.kelembaban}%` : '--%'}
+            icon={Droplets}
+            status={getLembabStatus()}
+            subtext="Batas Aman: 50%-80%"
+          />
+        </div>
 
-        <StatCard 
-          title="Kenyamanan HSI"
-          value={telemetry ? `${hsiData.val}` : '---'}
-          icon={Heart}
-          status={hsiData.status}
-          subtext={`Status: ${hsiData.label}`}
-          glow={hsiData.status !== 'safe'}
-        />
+        <div className="flex-1 min-w-0">
+          <StatCard 
+            title="Kenyamanan HSI"
+            value={telemetry ? `${hsiData.val}` : '---'}
+            icon={Heart}
+            status={hsiData.status}
+            subtext={`Status: ${hsiData.label}`}
+            glow={hsiData.status !== 'safe'}
+          />
+        </div>
 
-        <StatCard 
-          title="Kadar Gas Amonia"
-          value={telemetry ? `${telemetry.gas} ppm` : '-- ppm'}
-          icon={ShieldAlert}
-          status={getGasStatus()}
-          subtext={settings ? `Threshold: ${settings.gasThreshold} ppm` : 'Memuat...'}
-          glow={telemetry?.gas >= (settings?.gasThreshold || 1500)}
-        />
+        <div className="flex-1 min-w-0">
+          <StatCard 
+            title="Kadar Gas Amonia"
+            value={telemetry ? `${telemetry.gas} ppm` : '-- ppm'}
+            icon={ShieldAlert}
+            status={getGasStatus()}
+            subtext={settings ? `Thres: ${settings.gasThreshold} ppm` : 'Memuat...'}
+            glow={telemetry?.gas >= (settings?.gasThreshold || 1500)}
+          />
+        </div>
 
-        <StatCard 
-          title="Aktifitas Ayam"
-          value={getPirText()}
-          icon={HeartPulse}
-          status={getPirStatus()}
-          subtext={getPirSubtext()}
-          glow={isMassMortalityAlert || isNightAlertActive}
-        />
+        <div className="flex-1 min-w-0">
+          <StatCard 
+            title="Aktifitas Ayam"
+            value={getPirText()}
+            icon={HeartPulse}
+            status={getPirStatus()}
+            subtext={getPirSubtext()}
+            glow={isMassMortalityAlert || isNightAlertActive}
+          />
+        </div>
       </div>
 
       {/* CONTROLS & CHARTS SECTION - HIGHLY BALANCED HEIGHT LAYOUT */}

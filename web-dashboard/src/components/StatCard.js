@@ -36,7 +36,7 @@ export default function StatCard({ title, value, icon: Icon, status = 'safe', su
   }
 
   return (
-    <div className={`glass-card rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-6 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
+    <div className={`glass-card rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-4 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
       
       {/* Ornamen Latar Belakang Lingkaran Halus (Efek Kedalaman 3D) */}
       <div className={`absolute -right-4 -top-4 w-28 h-28 rounded-full blur-2xl opacity-10 bg-gradient-to-br ${
@@ -49,19 +49,19 @@ export default function StatCard({ title, value, icon: Icon, status = 'safe', su
           <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 bg-slate-100/70 px-2 py-0.5 rounded-md border border-slate-200/10">
             {title}
           </span>
-          <h3 className={`font-black mt-3 tracking-tight text-transparent bg-clip-text bg-gradient-to-br ${textGradient} ${
-            value && value.toString().length > 10 ? 'text-lg leading-tight mt-4' : 'text-3xl'
+          <h3 className={`font-black mt-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-br ${textGradient} ${
+            value && value.toString().length > 10 ? 'text-base leading-tight' : 'text-2xl'
           }`}>
             {value}
           </h3>
         </div>
-        <div className={`w-12 h-12 rounded-[16px_8px_16px_8px] bg-gradient-to-br flex items-center justify-center shrink-0 transition-transform duration-500 hover:scale-110 shadow-sm ${iconBgColor}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`w-10 h-10 rounded-[14px_7px_14px_7px] bg-gradient-to-br flex items-center justify-center shrink-0 transition-transform duration-500 hover:scale-110 shadow-sm ${iconBgColor}`}>
+          <Icon className="w-4 h-4" />
         </div>
       </div>
 
       {/* Baris Bawah: Keterangan & Badge Status Dinamis */}
-      <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-150/40 z-10">
+      <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-150/40 z-10">
         <span className="text-[10px] text-slate-400 font-bold tracking-wide flex items-center gap-1.5">
           {/* Pulsing Live Dot */}
           <span className="relative flex h-2 w-2">
