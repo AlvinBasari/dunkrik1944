@@ -31,6 +31,7 @@ export default function Home() {
   const [isConnected, setIsConnected] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSaveToast, setShowSaveToast] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Ambil sesi user yang sedang aktif
   const checkUserSession = async () => {
@@ -186,6 +187,14 @@ export default function Home() {
         }
       `}</style>
       
+      {/* Backdrop Overlay untuk Sidebar Mobile */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      
       {/* SIDEBAR COMPONENT */}
       <Sidebar 
         activeTab={activeTab}
@@ -194,6 +203,8 @@ export default function Home() {
         setIsMinimized={setIsMinimized}
         currentUser={currentUser}
         onLogout={handleLogout}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -205,6 +216,7 @@ export default function Home() {
           isConnected={isConnected}
           isFetching={isFetching}
           onRefresh={() => fetchData(false)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
         {/* TOAST SUCCESS SAVE */}

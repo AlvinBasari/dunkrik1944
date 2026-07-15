@@ -1,11 +1,12 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Menu } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
   isConnected, 
   isFetching, 
-  onRefresh 
+  onRefresh,
+  onToggleMobileMenu
 }) {
   const getHeaderTitle = () => {
     switch (activeTab) {
@@ -54,13 +55,23 @@ export default function Header({
   return (
     <header className="bg-white/80 backdrop-blur-md py-4 px-6 md:px-8 flex justify-between items-center rounded-[20px_8px_20px_8px] border border-slate-150/40 shadow-[0_8px_30px_rgba(0,0,0,0.015)] my-5 mr-5 ml-5 md:ml-4 sticky top-5 z-40">
       {/* KIRI: JUDUL & SUBJUDUL */}
-      <div>
-        <h1 className="text-sm font-black text-slate-800 tracking-tight leading-none">
-          {getHeaderTitle()}
-        </h1>
-        <p className="text-[8.5px] text-slate-400 mt-1 uppercase font-bold tracking-widest">
-          {getHeaderDesc()}
-        </p>
+      <div className="flex items-center gap-3">
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={onToggleMobileMenu}
+          className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 transition-all active:scale-95 shrink-0"
+          title="Menu Utama"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+        <div>
+          <h1 className="text-sm font-black text-slate-800 tracking-tight leading-none">
+            {getHeaderTitle()}
+          </h1>
+          <p className="text-[8.5px] text-slate-400 mt-1 uppercase font-bold tracking-widest">
+            {getHeaderDesc()}
+          </p>
+        </div>
       </div>
 
       {/* KANAN: AKADEMIK & STATUS & REFRESH */}

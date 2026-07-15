@@ -36,7 +36,7 @@ export default function StatCard({ title, value, icon: Icon, status = 'safe', su
   }
 
   return (
-    <div className={`glass-card h-full rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-4 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
+    <div className={`glass-card h-full rounded-[24px_10px_24px_10px] sm:rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-2.5 sm:p-4 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
       
       {/* Ornamen Latar Belakang Lingkaran Halus (Efek Kedalaman 3D) */}
       <div className={`absolute -right-4 -top-4 w-28 h-28 rounded-full blur-2xl opacity-10 bg-gradient-to-br ${
@@ -44,34 +44,36 @@ export default function StatCard({ title, value, icon: Icon, status = 'safe', su
       }`}></div>
 
       {/* Baris Atas: Label & Ikon Terapung */}
-      <div className="flex justify-between items-start gap-4 z-10">
+      <div className="flex justify-between items-start gap-1 sm:gap-4 z-10">
         <div>
-          <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 bg-slate-100/70 px-2 py-0.5 rounded-md border border-slate-200/10">
+          <span className="text-[7px] xs:text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-slate-400 bg-slate-100/70 px-1 sm:px-2 py-0.5 rounded-md border border-slate-200/10">
             {title}
           </span>
-          <h3 className={`font-black mt-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-br ${textGradient} ${
-            value && value.toString().length > 10 ? 'text-base leading-tight' : 'text-2xl'
+          <h3 className={`font-black mt-1 sm:mt-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-br ${textGradient} ${
+            value && value.toString().length > 10 
+              ? 'text-[10px] xs:text-xs sm:text-base leading-tight' 
+              : 'text-[11px] xs:text-sm sm:text-lg md:text-2xl'
           }`}>
             {value}
           </h3>
         </div>
-        <div className={`w-10 h-10 rounded-[14px_7px_14px_7px] bg-gradient-to-br flex items-center justify-center shrink-0 transition-transform duration-500 hover:scale-110 shadow-sm ${iconBgColor}`}>
-          <Icon className="w-4 h-4" />
+        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-[10px_5px_10px_5px] sm:rounded-[14px_7px_14px_7px] bg-gradient-to-br flex items-center justify-center shrink-0 transition-transform duration-500 hover:scale-110 shadow-sm ${iconBgColor}`}>
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
       </div>
 
       {/* Baris Bawah: Keterangan & Badge Status Dinamis */}
-      <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-150/40 z-10">
-        <span className="text-[10px] text-slate-400 font-bold tracking-wide flex items-center gap-1.5">
+      <div className="flex justify-between items-center mt-2.5 pt-2.5 sm:mt-3 sm:pt-3 border-t border-slate-150/40 z-10 gap-1">
+        <span className="text-[6.5px] xs:text-[7.5px] sm:text-[10px] text-slate-400 font-bold tracking-wide flex items-center gap-1">
           {/* Pulsing Live Dot */}
-          <span className="relative flex h-2 w-2">
+          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
             <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dotPingColor}`}></span>
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${dotPingColor}`}></span>
+            <span className={`relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 ${dotPingColor}`}></span>
           </span>
-          {subtext}
+          <span className="truncate max-w-[55px] xs:max-w-[70px] sm:max-w-none">{subtext}</span>
         </span>
         
-        <span className={`text-[9px] uppercase font-extrabold tracking-widest px-3 py-1 rounded-full border shadow-sm ${badgeColor}`}>
+        <span className={`text-[6px] xs:text-[7px] sm:text-[9px] uppercase font-extrabold tracking-widest px-1 py-0.5 sm:px-3 sm:py-1 rounded-full border shadow-sm shrink-0 ${badgeColor}`}>
           {badgeText}
         </span>
       </div>
