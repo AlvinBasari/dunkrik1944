@@ -63,8 +63,14 @@ export default function Home() {
         if (data.history.length > 0) {
           const latest = data.history[data.history.length - 1];
           setTelemetry(latest);
+          
+          // Cek apakah data terbaru dikirim kurang dari 20 detik yang lalu (alat IOT aktif mengirim data)
+          const lastTelemetryTime = new Date(latest.timestamp).getTime();
+          const diffInSeconds = Math.abs(Date.now() - lastTelemetryTime) / 1000;
+          setIsConnected(diffInSeconds <= 20);
+        } else {
+          setIsConnected(false);
         }
-        setIsConnected(true);
       }
     } catch (error) {
       console.error("Error fetching telemetry:", error);

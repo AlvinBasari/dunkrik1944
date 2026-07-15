@@ -78,9 +78,9 @@ export default function Header({
       <div className="flex items-center gap-4">
         
         {/* ACADEMIC METADATA BADGE (UAS INFO) */}
-        <div className="hidden lg:flex flex-col items-end text-[8px] font-black text-slate-400 tracking-wider uppercase border-r border-slate-200 pr-4 mr-1 text-right">
-          <p>STMIK MERCUSUAR • TUGAS UAS</p>
-          <p className="mt-0.5 text-teal-650">MIKROPROSESOR • DOSEN: BP. IKRAR</p>
+        <div className="hidden sm:flex flex-col items-end text-[9px] md:text-[10.5px] font-black tracking-wider uppercase bg-gradient-to-r from-teal-50 to-teal-100/60 border border-teal-200/60 rounded-2xl px-3.5 py-1.5 text-right shadow-[0_4px_12px_rgba(13,148,136,0.04)]">
+          <p className="text-teal-900">STMIK MERCUSUAR • TUGAS UAS</p>
+          <p className="mt-0.5 text-teal-600 font-extrabold">MIKROPROSESOR • DOSEN: BP. IKRAR</p>
         </div>
 
         {/* Pulsing Dot Connection Badge */}
