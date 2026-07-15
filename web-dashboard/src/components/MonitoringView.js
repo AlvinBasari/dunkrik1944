@@ -183,7 +183,7 @@ export default function MonitoringView({
       )}
 
       {/* SENSOR STATS ROW — flex, auto-shrink, tetap satu baris tanpa scrollbar */}
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row gap-3 items-stretch">
         <div className="flex-1 min-w-0">
           <StatCard 
             title="Suhu Kandang"

@@ -36,7 +36,7 @@ export default function StatCard({ title, value, icon: Icon, status = 'safe', su
   }
 
   return (
-    <div className={`glass-card rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-4 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
+    <div className={`glass-card h-full rounded-[32px_12px_32px_12px] relative overflow-hidden transition-all duration-500 border p-4 flex flex-col justify-between shadow-[0_12px_24px_rgba(4,47,46,0.018)] hover:-translate-y-1.5 hover:shadow-xl ${shadowColor} ${statusColorClasses}`}>
       
       {/* Ornamen Latar Belakang Lingkaran Halus (Efek Kedalaman 3D) */}
       <div className={`absolute -right-4 -top-4 w-28 h-28 rounded-full blur-2xl opacity-10 bg-gradient-to-br ${
