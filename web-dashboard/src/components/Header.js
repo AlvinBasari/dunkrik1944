@@ -24,6 +24,8 @@ export default function Header({
         return 'Keamanan Kandang (Night Watch)';
       case 'energy':
         return 'Analisis Konsumsi Energi & Listrik';
+      case 'users':
+        return 'Manajemen Pengguna & Otoritas';
       case 'monitoring':
       default:
         return 'Monitoring Kandang Real-time';
@@ -32,6 +34,8 @@ export default function Header({
 
   const getHeaderDesc = () => {
     switch (activeTab) {
+      case 'users':
+        return 'Kelola pendaftaran akun admin/operator kandang tambahan';
       case 'populasi':
         return 'Atur data ayam masuk dan siklus panen';
       case 'growth':

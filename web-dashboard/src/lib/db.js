@@ -199,6 +199,43 @@ export async function createUser(email, plainPassword, role = 'owner') {
   }
 }
 
+export async function getUsers() {
+  if (useMockFallback) {
+    return mockUsers.map(u => ({ id: u.id, email: u.email, role: u.role }));
+  }
+
+  try {
+    const res = await pool.query('SELECT id, email, role FROM users ORDER BY id ASC');
+    return res.rows;
+  } catch (err) {
+    console.error("❌ Gagal getUsers:", err.message);
+    return [];
+  }
+}
+
+export async function deleteUser(id) {
+  if (useMockFallback) {
+    const idx = mockUsers.findIndex(u => u.id === parseInt(id));
+    if (idx !== -1) {
+      const deleted = mockUsers[idx];
+      mockUsers.splice(idx, 1);
+      return deleted;
+    }
+    return null;
+  }
+
+  try {
+    const res = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id, email, role', [id]);
+    if (res.rows.length > 0) {
+      return res.rows[0];
+    }
+    return null;
+  } catch (err) {
+    console.error("❌ Gagal deleteUser:", err.message);
+    return null;
+  }
+}
+
 // Settings Helpers
 export async function getSettings() {
   if (useMockFallback) {

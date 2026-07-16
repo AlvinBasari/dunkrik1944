@@ -13,6 +13,7 @@ import EnergyView from '../components/EnergyView';
 import HealthView from '../components/HealthView';
 import AirView from '../components/AirView';
 import GrowthView from '../components/GrowthView';
+import UsersView from '../components/UsersView';
 
 export default function Home() {
   const router = useRouter();
@@ -292,6 +293,11 @@ export default function Home() {
           {activeTab === 'energy' && (
             <EnergyView 
               history={history}
+            />
+          )}
+          {activeTab === 'users' && (
+            <UsersView 
+              currentUser={currentUser}
             />
           )}
         </main>

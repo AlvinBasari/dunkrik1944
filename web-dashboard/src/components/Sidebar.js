@@ -10,7 +10,8 @@ import {
   Zap,
   HeartPulse,
   Wind,
-  TrendingUp
+  TrendingUp,
+  Users
 } from 'lucide-react';
 
 export default function Sidebar({ 
@@ -112,6 +113,7 @@ export default function Sidebar({
         {renderMenuButton('monitoring', 'Monitoring Real-time', LayoutDashboard)}
         {renderMenuButton('populasi', 'Manajemen Populasi', ClipboardList)}
         {renderMenuButton('growth', 'FCR & Tumbuh Kembang', TrendingUp)}
+        {renderMenuButton('users', 'Manajemen User', Users)}
 
         {renderCategoryHeader('Analisis Cerdik')}
         {renderMenuButton('health', 'Kesehatan & Aktivitas', HeartPulse)}
