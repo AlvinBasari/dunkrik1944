@@ -1,5 +1,7 @@
 import { initDb, addTelemetry, getTelemetryHistory, getSettings } from '../../../lib/db';
 
+export const dynamic = 'force-dynamic';
+
 let dbInitialized = false;
 
 async function ensureDb() {
@@ -61,7 +63,7 @@ export async function POST(request) {
 
     // Ambil setting aktif
     const settings = await getSettings();
-    const { suhuThreshold, gasThreshold, modeKipas } = settings;
+    const { suhuThreshold, gasThreshold, modeKipas, modeBuzzer } = settings;
 
     // Evaluasi aturan kontrol otomatis (seperti di main.cpp)
     const suhuTinggi = suhu >= suhuThreshold;
@@ -79,8 +81,19 @@ export async function POST(request) {
       kipas = false;
     }
 
+    let buzzer = false;
+    if (modeBuzzer === 1) {
+      // Manual ON (Pengusir Predator)
+      buzzer = true;
+    } else if (modeBuzzer === 2) {
+      // Manual OFF
+      buzzer = false;
+    } else {
+      // Auto
+      buzzer = gasTinggi;
+    }
+
     const led = gasTinggi;
-    const buzzer = gasTinggi;
 
     // Simpan ke database
     const telemetryData = {
@@ -102,6 +115,7 @@ export async function POST(request) {
       timestamp: savedRecord?.timestamp || new Date().toISOString(),
       control: {
         modeKipas,
+        modeBuzzer: modeBuzzer || 0,
         suhuThreshold,
         gasThreshold,
         kipas,

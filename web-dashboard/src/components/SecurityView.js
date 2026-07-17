@@ -34,11 +34,13 @@ export default function SecurityView({ telemetry, settings, history, isSavingSet
 
   const alertLogs = getNightMovementLogs();
 
-  const handleToggleBuzzer = () => {
-    if (!settings) return;
-    // Paksa buzzer ON dengan membunyikan alarm/buzzer di kandang
-    const forceBuzzer = telemetry?.buzzer ? 0 : 1; // dummy override toggle
-    alert("Buzzer test triggered! Pada IoT fisik, ini akan mengirim instruksi menyalakan buzzer secara manual.");
+  const currentBuzzerMode = settings?.modeBuzzer || 0;
+
+  const handleToggleBuzzer = async () => {
+    if (!onUpdateSettings) return;
+    // Toggle antara Mode 1 (Manual ON / Sirine Pengusir) dan Mode 0 (Auto)
+    const nextMode = currentBuzzerMode === 1 ? 0 : 1;
+    await onUpdateSettings({ modeBuzzer: nextMode });
   };
 
   return (
@@ -95,21 +97,44 @@ export default function SecurityView({ telemetry, settings, history, isSavingSet
             <p className="text-xs text-slate-650 leading-relaxed mb-4">
               Sirine/Buzzer dipasang langsung di kandang fisik ESP32 untuk menakut-nakuti predator (seperti ular, kucing liar, musang, tikus) dan memicu alarm ke pemilik kandang secara langsung.
             </p>
-            <div className="bg-amber-50/60 border border-amber-100/60 p-4 rounded-2xl flex items-start gap-3">
-              <Volume2 className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
-              <div className="text-[11px] text-slate-600 leading-relaxed">
-                <span className="font-extrabold text-amber-800">Uji Coba Sirine Kandang: </span>
-                Tombol di bawah digunakan untuk memicu sirine manual pada ESP32 untuk simulasi darurat atau pengusiran predator dari jarak jauh.
+            
+            <div className={`p-4 rounded-2xl border flex items-start gap-3 transition-all ${
+              currentBuzzerMode === 1
+                ? 'bg-red-50 border-red-200 text-red-900 animate-pulse'
+                : 'bg-amber-50/60 border-amber-100/60 text-amber-900'
+            }`}>
+              <Volume2 className={`w-5 h-5 mt-0.5 shrink-0 ${currentBuzzerMode === 1 ? 'text-red-600' : 'text-amber-600'}`} />
+              <div className="text-[11px] leading-relaxed">
+                <span className="font-extrabold">
+                  {currentBuzzerMode === 1 
+                    ? '🔊 SIRINE MANUAL SEDANG AKTIF BERBUNYI DI KANDANG! ' 
+                    : 'Uji Coba Sirine Kandang: '}
+                </span>
+                {currentBuzzerMode === 1 
+                  ? 'Perangkat ESP32 sedang membunyikan buzzer pengusir predator. Klik tombol di bawah untuk mematikan.'
+                  : 'Tombol di bawah digunakan untuk memicu sirine manual pada ESP32 untuk simulasi darurat atau pengusiran predator dari jarak jauh.'}
               </div>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={handleToggleBuzzer}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold transition-all mt-6 shadow-sm flex items-center justify-center gap-2 text-xs active:scale-[0.98]"
+            disabled={isSavingSettings}
+            className={`w-full py-3 rounded-xl font-extrabold transition-all mt-6 shadow-md flex items-center justify-center gap-2 text-xs active:scale-[0.98] ${
+              currentBuzzerMode === 1
+                ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500 shadow-red-600/20'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
+            }`}
           >
-            <Volume2 className="w-4 h-4" />
-            <span>Simulasi Uji Suara Buzzer (ESP32)</span>
+            <Volume2 className={`w-4 h-4 ${currentBuzzerMode === 1 ? 'animate-bounce' : ''}`} />
+            <span>
+              {isSavingSettings 
+                ? 'Mengirim Perintah ke ESP32...' 
+                : currentBuzzerMode === 1 
+                ? '⏹️ HENTIKAN SIRINE MANUAL (Kembali ke Mode Auto)' 
+                : '🚨 BUNYIKAN SIRINE MANUAL (Pengusir Predator)'}
+            </span>
           </button>
         </div>
 

@@ -4,6 +4,7 @@ import { RefreshCw, Menu } from 'lucide-react';
 export default function Header({ 
   activeTab, 
   isConnected, 
+  iotStats,
   isFetching, 
   onRefresh,
   onToggleMobileMenu
@@ -90,7 +91,11 @@ export default function Header({
         {/* Pulsing Dot Connection Badge */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-100 shadow-[0_4px_12px_rgb(0,0,0,0.01)] text-[9px] font-extrabold text-slate-600">
           <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-teal-500 animate-pulse' : 'bg-red-500'} shrink-0`} />
-          <span>{isConnected ? 'ONLINE' : 'DISCONNECTED'}</span>
+          <span>
+            {isConnected 
+              ? `ONLINE ${iotStats?.uptimeRatio !== undefined ? `(${iotStats.uptimeRatio}% Uptime)` : ''}` 
+              : 'DISCONNECTED'}
+          </span>
         </div>
 
         {/* Flat Refresh Button */}

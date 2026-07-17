@@ -15,19 +15,21 @@ export default function PopulationView({
   const [formTanggalMasuk, setFormTanggalMasuk] = useState('');
   const [formVarietasAyam, setFormVarietasAyam] = useState('Broiler');
   const [formSiklusPanen, setFormSiklusPanen] = useState(35);
+  const [isTouched, setIsTouched] = useState(false);
 
   // Sinkronisasi data form ketika settings di-load
   useEffect(() => {
-    if (settings) {
+    if (settings && !isTouched) {
       setFormJumlahAyam(settings.jumlahAyam);
       setFormTanggalMasuk(settings.tanggalMasuk);
       setFormVarietasAyam(settings.varietasAyam);
       setFormSiklusPanen(settings.siklusPanen);
     }
-  }, [settings]);
+  }, [settings, isTouched]);
 
   // Handler sinkronisasi varietas otomatis
   const handleVarietasChange = (varietas) => {
+    setIsTouched(true);
     setFormVarietasAyam(varietas);
     if (varietas === 'Broiler') {
       setFormSiklusPanen(35);
@@ -40,6 +42,7 @@ export default function PopulationView({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsTouched(false);
     onUpdateSettings({
       jumlahAyam: parseInt(formJumlahAyam),
       tanggalMasuk: formTanggalMasuk,
@@ -194,7 +197,10 @@ export default function PopulationView({
                 type="number" 
                 required
                 value={formJumlahAyam}
-                onChange={(e) => setFormJumlahAyam(e.target.value)}
+                onChange={(e) => {
+                  setFormJumlahAyam(e.target.value);
+                  setIsTouched(true);
+                }}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/80 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 bg-white text-slate-800 transition-all shadow-sm"
                 placeholder="Contoh: 1000"
                 min="1"
@@ -208,7 +214,10 @@ export default function PopulationView({
                 type="date" 
                 required
                 value={formTanggalMasuk}
-                onChange={(e) => setFormTanggalMasuk(e.target.value)}
+                onChange={(e) => {
+                  setFormTanggalMasuk(e.target.value);
+                  setIsTouched(true);
+                }}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/80 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 bg-white text-slate-600 transition-all shadow-sm"
               />
             </div>
@@ -240,7 +249,10 @@ export default function PopulationView({
                 type="number" 
                 required
                 value={formSiklusPanen}
-                onChange={(e) => setFormSiklusPanen(e.target.value)}
+                onChange={(e) => {
+                  setFormSiklusPanen(e.target.value);
+                  setIsTouched(true);
+                }}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/80 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 bg-white text-slate-800 transition-all shadow-sm"
                 placeholder="Contoh: 35"
                 min="1"

@@ -5,17 +5,19 @@ export default function ControlPanel({ settings, onUpdateSettings, isLoading }) 
   const [suhu, setSuhu] = useState(32.0);
   const [gas, setGas] = useState(1500);
   const [mode, setMode] = useState(0);
+  const [isTouched, setIsTouched] = useState(false);
 
   useEffect(() => {
-    if (settings) {
+    if (settings && !isTouched) {
       setSuhu(settings.suhuThreshold);
       setGas(settings.gasThreshold);
       setMode(settings.modeKipas);
     }
-  }, [settings]);
+  }, [settings, isTouched]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsTouched(false);
     onUpdateSettings({
       suhuThreshold: parseFloat(suhu),
       gasThreshold: parseInt(gas),
@@ -50,7 +52,10 @@ export default function ControlPanel({ settings, onUpdateSettings, isLoading }) 
               <button
                 key={opt.val}
                 type="button"
-                onClick={() => setMode(opt.val)}
+                onClick={() => {
+                  setMode(opt.val);
+                  setIsTouched(true);
+                }}
                 className={`py-2 px-1 rounded-lg text-xs font-bold transition-all ${
                   mode === opt.val
                     ? 'bg-teal-600 text-white shadow-md shadow-teal-600/10'
@@ -80,7 +85,10 @@ export default function ControlPanel({ settings, onUpdateSettings, isLoading }) 
             max="40"
             step="0.5"
             value={suhu}
-            onChange={(e) => setSuhu(e.target.value)}
+            onChange={(e) => {
+              setSuhu(e.target.value);
+              setIsTouched(true);
+            }}
             className="w-full accent-teal-600 bg-slate-100 h-2 rounded-lg cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
@@ -106,7 +114,10 @@ export default function ControlPanel({ settings, onUpdateSettings, isLoading }) 
             max="3000"
             step="100"
             value={gas}
-            onChange={(e) => setGas(e.target.value)}
+            onChange={(e) => {
+              setGas(e.target.value);
+              setIsTouched(true);
+            }}
             className="w-full accent-amber-500 bg-slate-100 h-2 rounded-lg cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">

@@ -14,6 +14,7 @@ import HealthView from '../components/HealthView';
 import AirView from '../components/AirView';
 import GrowthView from '../components/GrowthView';
 import UsersView from '../components/UsersView';
+import { calculateIotActiveStats } from '../lib/telemetryUtils';
 
 export default function Home() {
   const router = useRouter();
@@ -34,6 +35,9 @@ export default function Home() {
   const [showSaveToast, setShowSaveToast] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Ambil kalkulasi status durasi IoT Aktif dari history
+  const iotStats = calculateIotActiveStats(history);
+
   // Ambil sesi user yang sedang aktif
   const checkUserSession = async () => {
     try {
@@ -53,12 +57,17 @@ export default function Home() {
   const fetchData = async (isInitial = false) => {
     try {
       if (isInitial) setIsFetching(true);
-      const res = await fetch('/api/telemetry?limit=25');
+      const res = await fetch('/api/telemetry?limit=50');
       if (!res.ok) throw new Error("Gagal mengambil data");
       
       const data = await res.json();
       if (data.status === 'ok') {
-        setSettings(data.settings);
+        setSettings((prevSettings) => {
+          if (JSON.stringify(prevSettings) === JSON.stringify(data.settings)) {
+            return prevSettings;
+          }
+          return data.settings;
+        });
         setHistory(data.history);
         
         if (data.history.length > 0) {
@@ -221,6 +230,7 @@ export default function Home() {
         <Header 
           activeTab={activeTab}
           isConnected={isConnected}
+          iotStats={iotStats}
           isFetching={isFetching}
           onRefresh={() => fetchData(false)}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

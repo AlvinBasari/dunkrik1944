@@ -30,10 +30,12 @@ let mockSettings = {
   suhuThreshold: 32.0,
   gasThreshold: 1500,
   modeKipas: 0, // 0 = Auto, 1 = Force ON, 2 = Force OFF
+  modeBuzzer: 0, // 0 = Auto, 1 = Force ON (Sirine Manual), 2 = Force OFF
   jumlahAyam: 1250,
   tanggalMasuk: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 18 hari lalu
   varietasAyam: 'Broiler',
-  siklusPanen: 35
+  siklusPanen: 35,
+  hargaPakan: 12000
 };
 
 const defaultAdminPasswordHash = hashPassword('password123');
@@ -117,6 +119,8 @@ export async function initDb() {
       await client.query(`ALTER TABLE coop_settings ADD COLUMN IF NOT EXISTS tanggal_masuk DATE NOT NULL DEFAULT CURRENT_DATE - INTERVAL '18 days';`);
       await client.query(`ALTER TABLE coop_settings ADD COLUMN IF NOT EXISTS varietas_ayam VARCHAR(50) NOT NULL DEFAULT 'Broiler';`);
       await client.query(`ALTER TABLE coop_settings ADD COLUMN IF NOT EXISTS siklus_panen INT NOT NULL DEFAULT 35;`);
+      await client.query(`ALTER TABLE coop_settings ADD COLUMN IF NOT EXISTS harga_pakan INT NOT NULL DEFAULT 12000;`);
+      await client.query(`ALTER TABLE coop_settings ADD COLUMN IF NOT EXISTS mode_buzzer INT NOT NULL DEFAULT 0;`);
 
       const settingsCheck = await client.query('SELECT COUNT(*) FROM coop_settings');
       if (parseInt(settingsCheck.rows[0].count) === 0) {
@@ -245,7 +249,9 @@ export async function getSettings() {
   try {
     const res = await pool.query(`
       SELECT suhu_threshold, gas_threshold, mode_kipas, 
-             jumlah_ayam, tanggal_masuk, varietas_ayam, siklus_panen 
+             jumlah_ayam, tanggal_masuk, varietas_ayam, siklus_panen,
+             COALESCE(harga_pakan, 12000) as harga_pakan,
+             COALESCE(mode_buzzer, 0) as mode_buzzer
       FROM coop_settings LIMIT 1
     `);
     if (res.rows.length > 0) {
@@ -265,10 +271,12 @@ export async function getSettings() {
         suhuThreshold: row.suhu_threshold,
         gasThreshold: row.gas_threshold,
         modeKipas: row.mode_kipas,
+        modeBuzzer: row.mode_buzzer || 0,
         jumlahAyam: row.jumlah_ayam,
         tanggalMasuk: tanggalStr,
         varietasAyam: row.varietas_ayam,
-        siklusPanen: row.siklus_panen
+        siklusPanen: row.siklus_panen,
+        hargaPakan: row.harga_pakan || 12000
       };
     }
     return mockSettings;
@@ -278,15 +286,17 @@ export async function getSettings() {
   }
 }
 
-export async function updateSettings(suhu, gas, mode, jumlahAyam, tanggalMasuk, varietasAyam, siklusPanen) {
+export async function updateSettings(suhu, gas, mode, jumlahAyam, tanggalMasuk, varietasAyam, siklusPanen, hargaPakan, modeBuzzer) {
   if (useMockFallback) {
     if (suhu !== undefined) mockSettings.suhuThreshold = suhu;
     if (gas !== undefined) mockSettings.gasThreshold = gas;
     if (mode !== undefined) mockSettings.modeKipas = mode;
+    if (modeBuzzer !== undefined) mockSettings.modeBuzzer = modeBuzzer;
     if (jumlahAyam !== undefined) mockSettings.jumlahAyam = jumlahAyam;
     if (tanggalMasuk !== undefined) mockSettings.tanggalMasuk = tanggalMasuk;
     if (varietasAyam !== undefined) mockSettings.varietasAyam = varietasAyam;
     if (siklusPanen !== undefined) mockSettings.siklusPanen = siklusPanen;
+    if (hargaPakan !== undefined) mockSettings.hargaPakan = hargaPakan;
     return mockSettings;
   }
 
@@ -310,6 +320,11 @@ export async function updateSettings(suhu, gas, mode, jumlahAyam, tanggalMasuk, 
       params.push(mode);
       count++;
     }
+    if (modeBuzzer !== undefined) {
+      query += `mode_buzzer = $${count}, `;
+      params.push(modeBuzzer);
+      count++;
+    }
     if (jumlahAyam !== undefined) {
       query += `jumlah_ayam = $${count}, `;
       params.push(jumlahAyam);
@@ -330,11 +345,16 @@ export async function updateSettings(suhu, gas, mode, jumlahAyam, tanggalMasuk, 
       params.push(siklusPanen);
       count++;
     }
+    if (hargaPakan !== undefined) {
+      query += `harga_pakan = $${count}, `;
+      params.push(hargaPakan);
+      count++;
+    }
 
     query = query.trim().replace(/,$/, '');
     query += ` WHERE id = (SELECT id FROM coop_settings LIMIT 1) 
-              RETURNING suhu_threshold, gas_threshold, mode_kipas, 
-                        jumlah_ayam, tanggal_masuk, varietas_ayam, siklus_panen`;
+              RETURNING suhu_threshold, gas_threshold, mode_kipas, mode_buzzer,
+                        jumlah_ayam, tanggal_masuk, varietas_ayam, siklus_panen, harga_pakan`;
 
     const res = await pool.query(query, params);
     const row = res.rows[0];
@@ -353,10 +373,12 @@ export async function updateSettings(suhu, gas, mode, jumlahAyam, tanggalMasuk, 
       suhuThreshold: row.suhu_threshold,
       gasThreshold: row.gas_threshold,
       modeKipas: row.mode_kipas,
+      modeBuzzer: row.mode_buzzer || 0,
       jumlahAyam: row.jumlah_ayam,
       tanggalMasuk: tanggalStr,
       varietasAyam: row.varietas_ayam,
-      siklusPanen: row.siklus_panen
+      siklusPanen: row.siklus_panen,
+      hargaPakan: row.harga_pakan || 12000
     };
   } catch (err) {
     console.error("❌ Gagal updateSettings:", err.message);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Wind, ShieldAlert, AlertTriangle, AlertOctagon, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { calculateIotActiveStats } from '../lib/telemetryUtils';
 
 export default function AirView({ telemetry, history }) {
   
@@ -33,17 +34,16 @@ export default function AirView({ telemetry, history }) {
   const currentGas = telemetry ? telemetry.gas : 0;
   const gasStatus = getGasStatusObj(currentGas);
 
-  // Kalkulasi rasio paparan gas bahaya dari history
+  // Kalkulasi rasio paparan gas bahaya dari history berbasis durasi IoT aktif
   const calculateExposure = () => {
-    if (!history || history.length === 0) return { ratio: 0, hours: 0 };
-    const total = history.length;
-    const toxicCount = history.filter(item => item.gas >= 1500).length;
-    
-    const ratio = toxicCount / total;
-    const hours = parseFloat((ratio * 24).toFixed(1));
+    if (!history || history.length === 0) return { ratio: 0, hours: 0, seconds: 0, formatted: '0 Detik' };
+    const stats = calculateIotActiveStats(history);
+    const ratio = Math.round((stats.totalGasToxicMs / (stats.totalIotActiveMs || 1)) * 100);
     return {
-      ratio: Math.round(ratio * 100),
-      hours
+      ratio,
+      hours: stats.gasToxicHoursDaily,
+      seconds: stats.gasToxicSeconds,
+      formatted: stats.gasToxicFormatted
     };
   };
 
@@ -116,7 +116,7 @@ export default function AirView({ telemetry, history }) {
             </p>
             <div className="p-4 rounded-2xl bg-white border border-slate-200/50 shadow-inner text-xs font-medium text-slate-700 leading-relaxed">
               <span className="font-bold text-slate-850">Analisis Paparan Hari Ini: </span>
-              Ayam telah terpapar gas bahaya (&ge; 1500 ppm) selama <strong className="font-extrabold text-teal-900">{exposure.hours} Jam/Hari</strong> (atau sekitar <strong className="font-extrabold text-teal-900">{exposure.ratio}%</strong> dari total riwayat telemetri berjalan).
+              Ayam telah terpapar gas bahaya (&ge; 1500 ppm) selama <strong className="font-extrabold text-teal-900">{exposure.formatted}</strong> ({exposure.seconds} Detik, atau sekitar <strong className="font-extrabold text-teal-900">{exposure.ratio}%</strong> dari total waktu IoT aktif).
             </div>
           </div>
 

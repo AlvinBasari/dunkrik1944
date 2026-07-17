@@ -12,6 +12,7 @@ import {
 import StatCard from './StatCard';
 import ControlPanel from './ControlPanel';
 import SensorChart from './SensorChart';
+import { calculateIotActiveStats } from '../lib/telemetryUtils';
 
 export default function MonitoringView({
   telemetry,
@@ -55,16 +56,14 @@ export default function MonitoringView({
       return { ratio: 0, hours: 0, kwh: 0, cost: 0 };
     }
     
-    const totalRecords = history.length;
-    const activeRecords = history.filter(item => item.kipas).length;
-    
-    const ratio = activeRecords / totalRecords; // rasio kerja (0 s/d 1)
-    const hours = parseFloat((ratio * 24).toFixed(1)); // estimasi jam aktif per hari
+    const stats = calculateIotActiveStats(history);
+    const ratio = Math.round(stats.kipasDutyRatio * 100);
+    const hours = stats.kipasActiveHoursDaily; // jam kerja kipas per hari berbasis IoT aktif
     const kwh = parseFloat((hours * 0.005).toFixed(4)); // konsumsi energi harian (5 Watt = 0.005 kW)
     const cost = Math.round(kwh * 1500); // tarif listrik bisnis (Rp 1500 / kWh)
     
     return {
-      ratio: Math.round(ratio * 100),
+      ratio,
       hours,
       kwh,
       cost

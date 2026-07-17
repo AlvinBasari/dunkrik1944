@@ -7,17 +7,17 @@ import {
   Activity,
   Award
 } from 'lucide-react';
+import { calculateIotActiveStats } from '../lib/telemetryUtils';
 
 export default function EnergyView({ history }) {
   const [customWatt, setCustomWatt] = useState(5);
   const [customTarif, setCustomTarif] = useState(1500);
 
-  // Kalkulasi dasar durasi kipas dari history
+  // Kalkulasi dasar durasi kipas dari history berbasis IoT aktif
   const calculateBaseDuration = () => {
     if (!history || history.length === 0) return 0;
-    const total = history.length;
-    const active = history.filter(item => item.kipas).length;
-    return active / total; // rasio kerja (0 s/d 1)
+    const stats = calculateIotActiveStats(history);
+    return stats.kipasDutyRatio; // rasio kerja (0 s/d 1) saat IoT aktif
   };
 
   const activeRatio = calculateBaseDuration();

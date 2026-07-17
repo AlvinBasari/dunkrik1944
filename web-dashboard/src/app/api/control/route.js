@@ -1,5 +1,7 @@
 import { initDb, updateSettings, getSettings } from '../../../lib/db';
 
+export const dynamic = 'force-dynamic';
+
 let dbInitialized = false;
 
 async function ensureDb() {
@@ -19,10 +21,12 @@ export async function POST(request) {
       suhuThreshold, 
       gasThreshold, 
       modeKipas,
+      modeBuzzer,
       jumlahAyam,
       tanggalMasuk,
       varietasAyam,
-      siklusPanen
+      siklusPanen,
+      hargaPakan
     } = body;
 
     // Lakukan update settings
@@ -33,7 +37,9 @@ export async function POST(request) {
       jumlahAyam !== undefined ? parseInt(jumlahAyam) : undefined,
       tanggalMasuk !== undefined ? tanggalMasuk : undefined,
       varietasAyam !== undefined ? varietasAyam : undefined,
-      siklusPanen !== undefined ? parseInt(siklusPanen) : undefined
+      siklusPanen !== undefined ? parseInt(siklusPanen) : undefined,
+      hargaPakan !== undefined ? parseInt(hargaPakan) : undefined,
+      modeBuzzer !== undefined ? parseInt(modeBuzzer) : undefined
     );
 
     return new Response(JSON.stringify({

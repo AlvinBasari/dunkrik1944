@@ -2,6 +2,8 @@ import { initDb, getUsers, createUser, deleteUser } from '../../../lib/db';
 import { cookies } from 'next/headers';
 import { verifyToken } from '../../../lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 let dbInitialized = false;
 
 async function ensureDb() {

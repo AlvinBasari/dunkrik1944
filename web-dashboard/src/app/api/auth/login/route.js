@@ -1,6 +1,8 @@
 import { getUserByEmail, hashPassword, initDb } from '../../../../lib/db';
 import { signToken } from '../../../../lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 let dbInitialized = false;
 
 async function ensureDb() {
