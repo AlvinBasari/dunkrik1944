@@ -55,17 +55,18 @@ export default function GrowthView({ settings, history }) {
   };
 
   // ============================================
-  // PENGHITUNG UMUR AYAM
+  // PENGHITUNG UMUR AYAM (FALLBACK 18 HARI)
   // ============================================
   const calculateAge = () => {
     const dateStr = settings?.tanggalMasuk || settings?.chickInDate;
-    if (!dateStr) return 0;
+    if (!dateStr) return 18;
     const start = new Date(dateStr);
     const now = new Date();
     start.setHours(0, 0, 0, 0);
     now.setHours(0, 0, 0, 0);
     const diff = now - start;
-    return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+    const calculated = Math.floor(diff / (1000 * 60 * 60 * 24));
+    return calculated > 0 ? calculated : 18;
   };
 
   const age = calculateAge();
@@ -206,15 +207,14 @@ export default function GrowthView({ settings, history }) {
   const fcrData = analyzeFcr();
 
   // ============================================
-  // PLOTTING DATA GRAFIK (Target Ideal vs Hasil Perhitungan Pakan/Sensor)
+  // PLOTTING DATA GRAFIK DUA GARIS LENGKAP (0 s/d 35 HARI)
   // ============================================
   const generateChartData = () => {
     const data = [];
     const siklusTarget = parseInt(settings?.siklusPanen || 35);
-    const limit = Math.max(siklusTarget, age + 3);
 
     const dayPoints = new Set([0, 5, 10, 15, 20, 25, 30, siklusTarget]);
-    if (age > 0 && age <= limit) {
+    if (age > 0 && age <= siklusTarget) {
       dayPoints.add(age);
     }
     const sortedDays = Array.from(dayPoints).sort((a, b) => a - b);
@@ -223,11 +223,11 @@ export default function GrowthView({ settings, history }) {
       const targetW = getStandardWeight(d);
       const reduction = 1 - (fcrData.penalty * 0.4);
       
-      let calculatedW = null;
-      if (d <= age) {
+      let calculatedW = 42; // DOC weight pada Hari 0
+      if (d > 0) {
         if (fcrData.mode === 'nyata' && fcrData.pakanHariIni) {
-          // Bobot yang dihasilkan secara biologis dari input pakan riil
-          const totalPakanPoint = fcrData.pakanHariIni * (d || 1);
+          // Proyeksi pertumbuhan bobot dari input pakan riil peternak
+          const totalPakanPoint = fcrData.pakanHariIni * d;
           calculatedW = Math.round((totalPakanPoint / (1.45 * jumlahAyam)) * 1000);
         } else {
           // Bobot hasil estimasi penalti sensor IoT
@@ -670,7 +670,7 @@ export default function GrowthView({ settings, history }) {
                 <TrendingUp className="w-4.5 h-4.5 text-teal-600" /> Kurva Pertumbuhan Broiler Cobb 500 (Gram)
               </h4>
               <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                Perbandingan Kurva Target Ideal Standar vs Hasil Perhitungan {fcrData.mode === 'nyata' ? 'Pakan Riil' : 'Sensor IoT'}
+                Perbandingan Kurva Target Ideal Standar vs Hasil Perhitungan {fcrData.mode === 'nyata' ? 'Pakan Riil' : 'Sensor IoT'} (Siklus {settings?.siklusPanen || 35} Hari)
               </p>
             </div>
             <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider bg-amber-50 border border-amber-200/50 px-2.5 py-1 rounded-lg self-start sm:self-auto shrink-0">
