@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -206,7 +206,7 @@ export default function GrowthView({ settings, history }) {
   const fcrData = analyzeFcr();
 
   // ============================================
-  // PLOTTING DATA GRAFIK (Cobb 500 vs Aktual)
+  // PLOTTING DATA GRAFIK (Target Ideal vs Hasil Perhitungan Pakan/Sensor)
   // ============================================
   const generateChartData = () => {
     const data = [];
@@ -222,12 +222,23 @@ export default function GrowthView({ settings, history }) {
     for (const d of sortedDays) {
       const targetW = getStandardWeight(d);
       const reduction = 1 - (fcrData.penalty * 0.4);
-      const actualW = Math.round(targetW * (d <= age ? reduction : 1));
+      
+      let calculatedW = null;
+      if (d <= age) {
+        if (fcrData.mode === 'nyata' && fcrData.pakanHariIni) {
+          // Bobot yang dihasilkan secara biologis dari input pakan riil
+          const totalPakanPoint = fcrData.pakanHariIni * (d || 1);
+          calculatedW = Math.round((totalPakanPoint / (1.45 * jumlahAyam)) * 1000);
+        } else {
+          // Bobot hasil estimasi penalti sensor IoT
+          calculatedW = Math.round(targetW * reduction);
+        }
+      }
 
       data.push({
         day: d === age ? `Hari ${d} (Saat Ini)` : `Hari ${d}`,
-        Target: targetW,
-        Aktual: d <= age ? actualW : null
+        'Target Ideal Cobb 500': targetW,
+        'Hasil Perhitungan (Pakan/Sensor)': calculatedW
       });
     }
     return data;
@@ -653,36 +664,46 @@ export default function GrowthView({ settings, history }) {
         
         {/* GRAPH (2/3 width) */}
         <div className="lg:col-span-2 glass-card p-6 md:p-8 rounded-[32px_12px_32px_12px] border border-teal-500/10 bg-gradient-to-br from-white to-teal-50/15 shadow-[0_12px_24px_rgba(4,47,46,0.018)]">
-          <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-2 flex items-center gap-2">
-            <TrendingUp className="w-4.5 h-4.5 text-teal-600" /> Kurva Pertumbuhan Broiler Cobb 500 (Gram)
-          </h4>
-          <p className="text-[9px] text-amber-700 font-bold uppercase tracking-wider mb-5 bg-amber-50/50 border border-amber-200/40 px-2.5 py-1 rounded-lg inline-block">
-            🔬 Standar Cobb-Vantress Broiler Guide
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                <TrendingUp className="w-4.5 h-4.5 text-teal-600" /> Kurva Pertumbuhan Broiler Cobb 500 (Gram)
+              </h4>
+              <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                Perbandingan Kurva Target Ideal Standar vs Hasil Perhitungan {fcrData.mode === 'nyata' ? 'Pakan Riil' : 'Sensor IoT'}
+              </p>
+            </div>
+            <span className="text-[9px] text-amber-700 font-bold uppercase tracking-wider bg-amber-50 border border-amber-200/50 px-2.5 py-1 rounded-lg self-start sm:self-auto shrink-0">
+              🔬 Cobb-Vantress Guide
+            </span>
+          </div>
 
-          <div className="h-[280px] w-full">
+          <div className="h-[290px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} dy={10} />
                 <YAxis stroke="#94a3b8" fontSize={10} dx={-5} />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="Target" 
-                  name="Target Cobb 500"
-                  stroke="#94a3b8" 
-                  strokeDasharray="4 4"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', borderColor: '#cbd5e1', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '11px' }}
+                />
+                <Legend 
+                  wrapperStyle={{ fontSize: '11px', fontWeight: '800', paddingTop: '12px' }}
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="Aktual" 
-                  name="Estimasi Aktual (dengan penalti stres)"
-                  stroke="#0d9488" 
+                  dataKey="Target Ideal Cobb 500" 
+                  stroke="#64748b" 
+                  strokeDasharray="4 4"
+                  strokeWidth={2}
+                  dot={{ r: 3.5, fill: '#64748b' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="Hasil Perhitungan (Pakan/Sensor)" 
+                  stroke={fcrData.status === 'abnormal_low' ? '#ef4444' : '#0d9488'} 
                   strokeWidth={3}
-                  dot={{ stroke: '#0d9488', strokeWidth: 2, r: 4, fill: '#ffffff' }}
+                  dot={{ stroke: fcrData.status === 'abnormal_low' ? '#ef4444' : '#0d9488', strokeWidth: 2, r: 4.5, fill: '#ffffff' }}
                 />
               </LineChart>
             </ResponsiveContainer>
